@@ -1,0 +1,34 @@
+# This is a Databricks asset bundle definition for databricks_connect.
+# The Databricks extension requires databricks.yml configuration file.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+
+bundle:
+  name: databricks_connect
+
+variables:
+  project_root:
+    description: Caminho raiz para salvar os artefatos
+    default: /Workspace/Users/${workspace.current_user.userName}/databricks_connect
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://<token_url>.cloud.databricks.com
+      root_path: ${var.project_root}/dev
+    sync:
+      include: 
+        - dev/*
+      exclude:
+        - .databricks 
+
+  prod:
+    workspace:
+      host: https://<token_url>.cloud.databricks.com
+      root_path: ${var.project_root}/prod
+    sync:
+      include: 
+        - prod/*
+      exclude:
+        - .databricks
