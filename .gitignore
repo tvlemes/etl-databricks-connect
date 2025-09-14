@@ -1,0 +1,20 @@
+
+.databricks
+# typings
+# .gitignore
+# Readme.md
+# prod/
+# dev/
+# dataset/
+databricks.yml
+.databricks.env
+.venv
+# .env_example
+.env
+anotações
+test.ipynb
+# Readme.md
+Readme_v1.md
+# requirements.txt
+.vscode/
+# __pycache__/
