@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Deploy Dev",
+      "type": "shell",
+      "command": "databricks bundle deploy --target dev"
+    },
+    {
+      "label": "Deploy Prod",
+      "type": "shell",
+      "command": "databricks bundle deploy --target prod"
+    }
+  ]
+}

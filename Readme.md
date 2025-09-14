@@ -1,14 +1,17 @@
 # 📚 ETL com Databricks Connect 
 
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/tvlemes/APP-ETL-Basico-com-IA/blob/main/LICENSE)
-[![Status](https://img.shields.io/badge/status-Em%20Desenvolvimento-yellow.svg)]()
 
 Este repositório contém:
 - 📄 Um guia com comandos úteis para manipular arquivos no **Databricks File System (DBFS)**.
 - 📓 Notebooks prontos para uso que ajudam na criação de tabelas, limpeza de cache e configuração de catálogos, criação de uma arquitetura medalhão com as camadas Bronze, Silver e Gold.
 
 ---
+
+
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/tvlemes/etl-databricks-connect/blob/main/LICENSE)
+[![Status](https://img.shields.io/badge/status-Concluído-green.svg)]()
+
 
 ## 📂 Estrutura do Repositório
 

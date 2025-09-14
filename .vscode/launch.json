@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run with Databricks Connect (DEV)",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "env": {
+        "DATABRICKS_BUNDLE_TARGET": "dev"
+      }
+    },
+    {
+      "name": "Run with Databricks Connect (PROD)",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "env": {
+        "DATABRICKS_BUNDLE_TARGET": "prod"
+      }
+    }
+  ]
+}
