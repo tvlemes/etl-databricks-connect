@@ -1,5 +1,6 @@
 # 📚 ETL com Databricks Connect 
 
+<img src="./docs/2-Catalog.png">
 
 Este repositório contém:
 - 📄 Um guia com comandos úteis para manipular arquivos no **Databricks File System (DBFS)**.
