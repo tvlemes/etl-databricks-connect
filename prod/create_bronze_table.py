@@ -1,133 +1,130 @@
-'''
-Schema Bronze
-Autor: Thiago Vilarinho Lemes\
-Projeto: ETL no Databricks utilizando Catalog \
+"""
+Create Bronze Table
+Autor: Thiago Vilarinho Lemes
+Projeto: ETL no Databricks utilizando Catalog
 Data: 14/09/2025
-'''
+"""
 
 # COMMAND ----------
-
 from databricks.connect import DatabricksSession
-from pyspark.sql import functions as F
+import pandas as pd
 import os
 from dotenv import load_dotenv
-import pandas as pd
 
 # COMMAND ----------
-
-# Carrega as variáveis de ambiente do arquivo .env
-
-load_dotenv()
-
-catalog_name = os.getenv("NAME_CATALOG")
-
-schema_bronze = os.getenv("NAME_SCHEMA_BRONZE")
-table_bronze = os.getenv("NAME_TABLE_BRONZE")
-
-schema_silver = os.getenv("NAME_SCHEMA_SILVER")
-table_silver = os.getenv("NAME_TABLE_SILVER")
-
-schema_gold = os.getenv("NAME_SCHEMA_GOLD")
-table_gold = os.getenv("NAME_TABLE_GOLD")
-
-schema_raw = os.getenv("NAME_SCHEMA_RAW")
-bucket_raw = os.getenv("NAME_STORAGE")
-
-# COMMAND ----------
-
-# Cria a sessão Spark usando Databricks Connect
-spark = DatabricksSession.builder.getOrCreate()
+def get_env_variables():
+    '''
+    Carrega as variáveis de ambiente do .env.
+    Returns: 
+        Dicionário com as variáveis de ambiente necessárias.
+    '''
+    load_dotenv()
+    return {
+        "catalog_name": os.getenv("NAME_CATALOG"),
+        "schema_bronze": os.getenv("NAME_SCHEMA_BRONZE"),
+        "table_bronze": os.getenv("NAME_TABLE_BRONZE"),
+        "schema_silver": os.getenv("NAME_SCHEMA_SILVER"),
+        "table_silver": os.getenv("NAME_TABLE_SILVER"),
+        "schema_gold": os.getenv("NAME_SCHEMA_GOLD"),
+        "table_gold": os.getenv("NAME_TABLE_GOLD"),
+        "schema_raw": os.getenv("NAME_SCHEMA_RAW"),
+        "bucket_raw": os.getenv("NAME_STORAGE"),
+    }
 
 # COMMAND ----------
-
-# Seleciona o catalog e schema a serem utilizados
-spark.sql(f"USE CATALOG {catalog_name}")
-spark.sql(f"USE SCHEMA {schema_bronze}")
-
-# COMMAND ----------
-
-try:
-    # Carrega os datasets dos arquivos Parquet
-    df_1 = pd.read_parquet("../../dataset/netflix_v01.parquet")
-    df_2 = pd.read_parquet("../../dataset/netflix_v02.parquet")
-
-    # Transforma os DataFrames do Pandas em DataFrames do Spark
-    df_1 = spark.createDataFrame(df_1)
-    df_2 = spark.createDataFrame(df_2)
-    print("Arquivos Parquet carregados com sucesso.")
-except Exception as e:
-    print("Erro ao carregar os arquivos Parquet:", e)
-    raise
+def get_spark_session():
+    '''
+    Cria a sessão Spark usando Databricks Connect.
+    Returns:
+        sessão Spark
+    '''
+    return DatabricksSession.builder.getOrCreate()
 
 # COMMAND ----------
-
-# Verifica o schema e o tamanho dos DataFrames
-print("DataFrame 1:")
-print("Tamanho:", df_1.count(), "linhas")
-print("*" * 20)
-print(df_1.show(5))
-print("\n")
-print("DataFrame 2:")
-print("Tamanho:", df_2.count(), "linhas")
-print("*" * 20)
-print(df_2.show(5))
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Analise Exploratória
+def set_catalog_and_schema(spark, catalog_name, schema_name):
+    '''
+    Configura o catálogo e schema no Spark.
+    Args:
+        spark: sessão Spark
+        catalog_name: nome do catálogo
+        schema_name: nome do schema
+    '''
+    spark.sql(f"USE CATALOG {catalog_name}")
+    spark.sql(f"USE SCHEMA {schema_name}")
 
 # COMMAND ----------
-
-# Quantidade de linhas e colunas dos DataFrames
-print("Dataframe 1")
-print(f"Quantidade de linha: {df_1.count()} linhas")
-print(f"Quantidade de colunas: {len(df_1.columns)} colunas")
-print("*" * 50)
-print("Dataframe 2")
-print(f"Quantidade de linha: {df_2.count()} linhas")
-print(f"Quantidade de colunas: {len(df_2.columns)} colunas")
-
-# COMMAND ----------
-
-# Nome das colunas
-print("Colunas dos DataFrames 1")
-print(df_1.columns)
-
-print("*" * 139)
-
-print("Colunas dos DataFrames 2")
-print(df_2.columns)
-
-print("*" * 139)
-
-# Verifica se os DataFrames possuem as mesmas colunas para realizar o merge
-if set(df_1.columns) != set(df_2.columns):
-    raise ValueError("Os DataFrames possuem colunas diferentes.")
-else:
-    print("Os DataFrames possuem as mesmas colunas.")
+def load_parquet_files(file1, file2):
+    '''
+    Carrega dois arquivos parquet em DataFrames Pandas.
+    Args:
+        file1: caminho do primeiro arquivo parquet
+        file2: caminho do segundo arquivo parquet
+    Returns:
+        dois DataFrames Pandas
+    '''
+    df_1 = pd.read_parquet(file1)
+    df_2 = pd.read_parquet(file2)
+    return df_1, df_2
 
 # COMMAND ----------
-
-# 1° Forma - Realiza o merge dos datasets
-# df_combined = df_1.join(df_2, on="id", how="outer")  # outer join mantém todas as linhas
-
-# COMMAND ----------
-
-# 2° Forma - Realiza o merge dos datasets
-df = df_1.unionByName(df_2)
-
-# COMMAND ----------
-
-print("DataFrame:")
-print("Tamanho:", df.count(), "linhas")
-print("*" * 21)
-df.show(5, truncate=False)
+def convert_to_spark_df(spark, df_1, df_2):
+    '''
+    Converte DataFrames Pandas para Spark.
+    Args:
+        spark: sessão Spark
+        df_1: DataFrame Pandas 1
+        df_2: DataFrame Pandas 2
+    Returns:
+        dois DataFrames Spark    
+    '''
+    return spark.createDataFrame(df_1), spark.createDataFrame(df_2)
 
 # COMMAND ----------
+def combine_dataframes(df_1, df_2):
+    '''
+    Combina dois DataFrames Spark usando unionByName.
+    Args:
+        df_1: DataFrame Spark 1
+        df_2: DataFrame Spark 2
+    Returns:
+        DataFrame Spark combinado
+    '''
+    if set(df_1.columns) != set(df_2.columns):
+        raise ValueError("Os DataFrames possuem colunas diferentes.")
+    return df_1.unionByName(df_2)
 
-try:
-    df.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_raw}.{bucket_raw}")
-    print("DataFrames carregados com sucesso!")
-except Exception as e:
-    print(f"Erro ao carregar DataFrames: {e}")
+# COMMAND ----------
+def write_delta_table(df, catalog_name, schema_name, table_name):
+    '''
+    Escreve o DataFrame Spark em uma tabela Delta.
+    Args:
+        df: DataFrame Spark
+        catalog_name: nome do catálogo
+        schema_name: nome do schema
+        table_name: nome da tabela
+    '''
+    df.write.format("delta").mode("overwrite").saveAsTable(
+        f"{catalog_name}.{schema_name}.{table_name}"
+    )
+
+# COMMAND ----------
+def run_pipeline(file1="../../dataset/netflix_v01.parquet", file2="../../dataset/netflix_v02.parquet"):
+    '''
+    Executa toda a pipeline do Bronze Schema.
+    Args:
+        file1: caminho do primeiro arquivo parquet
+        file2: caminho do segundo arquivo parquet
+    Returns:
+        DataFrame Spark final
+    '''
+    env = get_env_variables()
+    spark = get_spark_session()
+
+    set_catalog_and_schema(spark, env["catalog_name"], env["schema_bronze"])
+
+    df_1, df_2 = load_parquet_files(file1, file2)
+    sdf_1, sdf_2 = convert_to_spark_df(spark, df_1, df_2)
+    df_combined = combine_dataframes(sdf_1, sdf_2)
+
+    write_delta_table(df_combined, env["catalog_name"], env["schema_raw"], env["bucket_raw"])
+    return df_combined

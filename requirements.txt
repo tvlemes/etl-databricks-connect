@@ -3,3 +3,4 @@ wheel
 python-dotenv
 databricks-sdk[notebook]
 nbformat
+pytest
