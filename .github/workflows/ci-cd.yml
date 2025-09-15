@@ -23,7 +23,7 @@ jobs:
       - name: Instalar dependências
         run: 
           pip install -r requirements.txt
-          # pip install databricks-connect
+          pip install databricks-connect
 
       - name: Rodar testes
         run: pytest --maxfail=1 --disable-warnings -q
