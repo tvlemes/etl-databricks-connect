@@ -20,9 +20,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Instalar dependências
+      - name: Instalar requirements.txt
         run: 
           pip install -r requirements.txt
+
+      - name: Instalar databricks-connect
+        run: 
           pip install databricks-connect
 
       - name: Rodar testes
