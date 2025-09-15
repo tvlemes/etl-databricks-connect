@@ -4,4 +4,3 @@ python-dotenv
 databricks-sdk[notebook]
 nbformat
 pytest
-databricks-connect
